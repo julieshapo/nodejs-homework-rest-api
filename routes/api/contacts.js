@@ -1,11 +1,8 @@
 const express = require("express");
-
 const ctrl = require("../../controllers/contacts");
 
 const validateBody = require("../../middlewares/validateBody");
-
 const isValidId = require("./../../middlewares/isValidId");
-
 const { postSchema, patchSchema } = require("../../schemas/contacts");
 
 const router = express.Router();
