@@ -3,10 +3,12 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
+const Jimp = require("jimp");
 
 const User = require("../models/user");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
 const { HttpError } = require("../helpers/HttpError");
+const { execPath } = require("process");
 
 const { SECRET_KEY } = process.env;
 
@@ -78,18 +80,33 @@ const logout = async (req, res) => {
 };
 
 const updateAvatar = async (req, res) => {
-  const { _id } = req.user;
-  const { path: tmpUpload, originalname } = req.file;
-  const filename = `${_id}_${originalname}`;
-  const resultUpload = path.join(avatarsDir, filename);
-  await fs.rename(tmpUpload, resultUpload);
+  try {
+    const { _id } = req.user;
+    const { path: tmpUpload, originalname } = req.file;
 
-  const avatarURL = path.join("avatars", filename);
-  await User.findByIdAndUpdate(_id, { avatarURL });
+    await Jimp.read(tmpUpload)
+      .then((image) => {
+        return image.resize(250, 250).quality(60).write(originalname);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
-  res.status(200).json({
-    avatarURL,
-  });
+    const filename = `${_id}_${originalname}`;
+    const resultUpload = path.join(avatarsDir, filename);
+
+    await fs.rename(tmpUpload, resultUpload);
+
+    const avatarURL = path.join("avatars", filename);
+    await User.findByIdAndUpdate(_id, { avatarURL });
+
+    res.status(200).json({
+      avatarURL,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update avatar." });
+  }
 };
 
 module.exports = {
