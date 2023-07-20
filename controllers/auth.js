@@ -8,7 +8,6 @@ const Jimp = require("jimp");
 const User = require("../models/user");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
 const { HttpError } = require("../helpers/HttpError");
-const { execPath } = require("process");
 
 const { SECRET_KEY } = process.env;
 
