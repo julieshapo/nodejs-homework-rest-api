@@ -7,9 +7,8 @@ const Jimp = require("jimp");
 const { nanoid } = require("nanoid");
 
 const User = require("../models/user");
-const ctrlWrapper = require("../helpers/ctrlWrapper");
-const { HttpError } = require("../helpers/HttpError");
-const sendEmail = require("./../helpers/sendEmail");
+
+const { ctrlWrapper, HttpError, sendEmail } = require("./../helpers/index");
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
